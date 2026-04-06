@@ -158,7 +158,6 @@
 
 .notes-editor .task-item__stamp {
   flex-shrink: 0;
-  margin-left: auto;
   align-self: center;
   font-size: 0.65rem;
   line-height: 1.25;
@@ -174,11 +173,68 @@
   display: none;
 }
 
-/* Checked tasks stay in the list; style them so completion is obvious */
-.notes-editor li[data-type='taskItem'][data-checked='true'] > div,
-.notes-editor .task-item[data-checked='true'] > div {
-  text-decoration: line-through;
+.notes-editor .task-item__delete {
+  flex-shrink: 0;
+  margin-left: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin: 0;
+  padding: 0;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--dro-text);
+  opacity: 0.38;
+  cursor: pointer;
+  align-self: center;
+  transition:
+    opacity 0.15s ease,
+    background 0.15s ease,
+    color 0.15s ease;
+}
+
+.notes-editor .task-item__delete:hover {
+  opacity: 1;
+  background: color-mix(in srgb, var(--dro-urgent) 14%, transparent);
+  color: var(--dro-urgent);
+}
+
+.notes-editor .task-item__delete:focus {
+  outline: none;
+}
+
+.notes-editor .task-item__delete:focus-visible {
+  opacity: 1;
+  outline: 2px solid var(--dro-accent);
+  outline-offset: 1px;
+}
+
+.notes-editor li[data-type='taskItem']:hover .task-item__delete {
+  opacity: 0.65;
+}
+
+/* Checked tasks stay in the list; strike through inline marks too (urgent, bold, color) */
+.notes-editor li[data-type='taskItem'][data-checked='true'] > div {
   opacity: 0.72;
+}
+
+.notes-editor li[data-type='taskItem'][data-checked='true'] > div,
+.notes-editor li[data-type='taskItem'][data-checked='true'] > div * {
+  text-decoration: line-through;
+  text-decoration-thickness: max(1px, 0.07em);
+}
+
+.notes-editor .task-item[data-checked='true'] > div {
+  opacity: 0.72;
+}
+
+.notes-editor .task-item[data-checked='true'] > div,
+.notes-editor .task-item[data-checked='true'] > div * {
+  text-decoration: line-through;
+  text-decoration-thickness: max(1px, 0.07em);
 }
 
 .notes-editor .task-item--urgent,
