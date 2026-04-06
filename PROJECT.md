@@ -55,6 +55,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 
 ## Paths
 
+- Remote: https://github.com/Mreoch1/desktop-reminder-overlay
 - Main: `electron/main.ts`
 - Preload: `electron/preload.ts`
 - Renderer: `src/App.tsx`, `src/features/notes/*`
