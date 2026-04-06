@@ -1,0 +1,215 @@
+.notes-editor-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: var(--dro-density-stack-gap, 0.5rem);
+  flex: 1;
+  min-height: 0;
+}
+
+.notes-editor--loading {
+  padding: 1rem;
+  opacity: 0.7;
+}
+
+.notes-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--dro-density-toolbar-gap, 0.4rem);
+  padding: var(--dro-density-toolbar-pad, 0.35rem 0.3rem);
+  border-radius: var(--dro-radius-sm);
+  /* Lighter than before so the list feels primary, not a second “card” */
+  background: color-mix(
+    in srgb,
+    var(--dro-surface) calc(52% * var(--dro-chrome-mult, 1)),
+    transparent
+  );
+  border: 1px solid
+    color-mix(
+      in srgb,
+      var(--dro-border) calc(55% * var(--dro-chrome-mult, 1)),
+      transparent
+    );
+  transition:
+    background 0.22s ease,
+    border-color 0.22s ease;
+}
+
+.notes-toolbar__label {
+  font-size: 0.7rem;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+  margin-left: 0.25rem;
+}
+
+.notes-toolbar__btn {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  border: 1px solid var(--dro-border);
+  background: var(--dro-surface-2);
+  color: var(--dro-text);
+  cursor: pointer;
+}
+
+.notes-toolbar__btn:hover {
+  border-color: color-mix(in srgb, var(--dro-accent) 55%, var(--dro-border));
+}
+
+.notes-toolbar__btn:focus-visible {
+  outline: 2px solid var(--dro-accent);
+  outline-offset: 1px;
+}
+
+.notes-toolbar__btn.is-active {
+  background: color-mix(in srgb, var(--dro-accent) 22%, var(--dro-surface-2));
+  border-color: var(--dro-accent);
+}
+
+.notes-toolbar__swatch {
+  width: 1.1rem;
+  height: 1.1rem;
+  border-radius: 50%;
+  border: 1px solid var(--dro-border);
+  cursor: pointer;
+  padding: 0;
+}
+
+.notes-bubble {
+  display: flex;
+  gap: 0.25rem;
+  padding: 0.25rem;
+  border-radius: 8px;
+  background: var(--dro-surface);
+  border: 1px solid var(--dro-border);
+  box-shadow: var(--dro-shadow);
+}
+
+.notes-bubble__btn {
+  font: inherit;
+  font-size: 0.8rem;
+  min-width: 1.75rem;
+  padding: 0.15rem 0.35rem;
+  border-radius: 4px;
+  border: 1px solid var(--dro-border);
+  background: var(--dro-surface-2);
+  cursor: pointer;
+}
+
+.notes-editor {
+  outline: none;
+  min-height: 12rem;
+  max-height: calc(100vh - 14rem);
+  overflow: auto;
+  padding: var(--dro-density-editor-pad, 0.4rem 0.18rem);
+  font-size: var(--dro-font-size);
+  line-height: var(--dro-line-height);
+  color: var(--dro-text);
+  /* Readability on bright or busy desktop wallpapers */
+  text-shadow: var(--dro-text-legibility);
+}
+
+.notes-editor .task-list {
+  list-style: none;
+  padding-left: 0;
+  margin: 0;
+}
+
+/* TipTap uses li[data-type="taskItem"], not always .task-item */
+.notes-editor li[data-type='taskItem'],
+.notes-editor .task-item {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: var(--dro-density-task-gap, 0.45rem);
+  margin: var(--dro-density-task-my, 0.25rem) 0;
+  padding: var(--dro-density-task-py, 0.2rem) var(--dro-density-task-px, 0.35rem);
+  border-radius: 6px;
+  list-style: none;
+}
+
+.notes-editor li[data-type='taskItem'] > label,
+.notes-editor .task-item > label {
+  display: inline-flex;
+  align-items: center;
+  flex-shrink: 0;
+  margin: 0;
+  cursor: pointer;
+  gap: var(--dro-density-label-gap, 0.32rem);
+}
+
+.notes-editor li[data-type='taskItem'] > label input[type='checkbox'],
+.notes-editor .task-item > label input[type='checkbox'] {
+  width: 1rem;
+  height: 1rem;
+  margin: 0;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--dro-accent);
+}
+
+.notes-editor li[data-type='taskItem'] > div,
+.notes-editor .task-item > div {
+  flex: 1;
+  min-width: 0;
+}
+
+.notes-editor .task-item__stamp {
+  flex-shrink: 0;
+  margin-left: auto;
+  align-self: center;
+  font-size: 0.65rem;
+  line-height: 1.25;
+  opacity: 0.58;
+  white-space: nowrap;
+  padding-left: 0.4rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--dro-text);
+  text-shadow: var(--dro-text-legibility);
+}
+
+.notes-editor .task-item__stamp[hidden] {
+  display: none;
+}
+
+/* Checked tasks stay in the list; style them so completion is obvious */
+.notes-editor li[data-type='taskItem'][data-checked='true'] > div,
+.notes-editor .task-item[data-checked='true'] > div {
+  text-decoration: line-through;
+  opacity: 0.72;
+}
+
+.notes-editor .task-item--urgent,
+.notes-editor li.task-item--urgent,
+.notes-editor li[data-type='taskItem'].task-item--urgent {
+  border-left: 3px solid var(--dro-urgent);
+  padding-left: var(--dro-density-urgent-pl, 0.45rem);
+  background: color-mix(in srgb, var(--dro-urgent) 8%, transparent);
+}
+
+.notes-editor p {
+  margin: 0.1rem 0;
+}
+
+.notes-editor-footer {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.notes-footer__btn {
+  font: inherit;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  border: 1px solid var(--dro-border);
+  background: transparent;
+  color: var(--dro-text);
+  cursor: pointer;
+}
+
+.notes-footer__btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}

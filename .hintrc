@@ -1,0 +1,10 @@
+{
+  "hints": {
+    "compat-api/css": [
+      "error",
+      {
+        "ignore": ["-webkit-app-region"]
+      }
+    ]
+  }
+}

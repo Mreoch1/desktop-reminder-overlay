@@ -1,0 +1,11 @@
+/* Electron transparent window: no opaque page background */
+html,
+body {
+  margin: 0;
+  height: 100%;
+  background: transparent;
+}
+
+#root {
+  height: 100%;
+}
