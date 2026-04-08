@@ -20,10 +20,10 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 - Frameless window with custom title bar; `-webkit-app-region` drag on the title area.
 - macOS: `setVisibleOnAllWorkspaces` uses `skipTransformProcessType: true` so Electron does not flip the app into `UIElement` process mode (which omits the app from the standard Force Quit dialog). `app.setActivationPolicy('regular')` on startup reinforces a normal foreground app.
 - No click-through: the window always receives mouse events (removed for usability). Main calls `setIgnoreMouseEvents(false)` on create and ready-to-show so a stale `dist-electron` build that still honored old `clickThrough` in JSON cannot leave the window non-interactive after `npm run build`.
-- Task list rows use CSS on `li[data-type="taskItem"]` so the checkbox stays beside the text (TipTap does not always add `.task-item` alone). Each row has a **delete** control (`task-item__delete`, trash icon) in the node view; deleting the **last** row clears it to an empty task line so `taskList` always has at least one `taskItem`. Checked lines use `text-decoration: line-through` on the content wrapper and descendants so strikethrough applies even with urgent styling or inline marks (bold, color).
+- Task list rows use CSS on `li[data-type="taskItem"]` so the checkbox stays beside the text (TipTap does not always add `.task-item` alone). Row DOM: checkbox `label`, **`.task-item__content`** (TipTap `contentDOM`), **`.task-item__end`** (timestamp + delete). Delete is last so it sits away from the checkbox. Strikethrough targets **`.task-item__content`** only (not the end cluster), including urgent rows and inline marks. Deleting the **last** row clears it to an empty task line so `taskList` always has at least one `taskItem`.
 - Theme: `theme-light` / `theme-dark` on `documentElement` from settings (light, dark, system). Accent, font, line height, and panel opacity tokens are set on `document.documentElement` so `var(--dro-accent)` resolves app-wide (not only on a nested wrapper).
 - Visual intent: **glass on the desktop**, not a solid Notes-style panel. Surfaces and borders stay light; default **panel fill** (`bgOpacity`) is moderate so the wallpaper shows through; **backdrop blur** and **theme-specific `text-shadow`** (`--dro-text-legibility`) keep task text readable on bright or busy backgrounds. Toolbar chrome is intentionally more transparent than the main shell so the checklist reads as the focus.
-- Optional **chrome dim until hover/focus**: `--dro-chrome-mult` fades panel chrome (background, borders, toolbar) while `.notes-editor` stays `opacity: 1`. Electron `setOpacity` still dims the whole window; settings copy steers users toward 100% window opacity plus panel controls for readable reminders.
+- Optional **chrome dim until hover/focus**: in idle state (`.app-shell--chrome-dim:not(:hover):not(:focus-within)`), frame chrome is fully hidden (`--dro-chrome-mult: 0`) and header/toolbar/footer are transparent and non-interactive so only note content remains visible. On hover/focus, full chrome returns.
 - Import bumps `docVersion` so the editor reloads document from store without feeding every keystroke back as props.
 - **Density** (`app-shell--compact` vs `--comfortable`) sets `--dro-density-*` tokens on `.app-shell` (main padding, title bar, toolbar, editor, task row spacing). Previously only `--pad` on `main` plus a fixed `padding-top` made the setting nearly invisible.
 
@@ -56,6 +56,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 ## Paths
 
 - Remote: https://github.com/Mreoch1/desktop-reminder-overlay
+- Releases (installers): https://github.com/Mreoch1/desktop-reminder-overlay/releases — tags follow **semver** (`v1.0.0`); `package.json` `version` must match the release you publish.
 - Main: `electron/main.ts`
 - Preload: `electron/preload.ts`
 - Renderer: `src/App.tsx`, `src/features/notes/*`

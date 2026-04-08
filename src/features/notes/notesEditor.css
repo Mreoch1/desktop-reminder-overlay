@@ -122,7 +122,8 @@
 .notes-editor .task-item {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  flex-wrap: nowrap;
+  align-items: flex-start;
   gap: var(--dro-density-task-gap, 0.45rem);
   margin: var(--dro-density-task-my, 0.25rem) 0;
   padding: var(--dro-density-task-py, 0.2rem) var(--dro-density-task-px, 0.35rem);
@@ -135,7 +136,9 @@
   display: inline-flex;
   align-items: center;
   flex-shrink: 0;
+  align-self: flex-start;
   margin: 0;
+  padding-top: 0.14rem;
   cursor: pointer;
   gap: var(--dro-density-label-gap, 0.32rem);
 }
@@ -150,20 +153,29 @@
   accent-color: var(--dro-accent);
 }
 
-.notes-editor li[data-type='taskItem'] > div,
-.notes-editor .task-item > div {
-  flex: 1;
+.notes-editor li[data-type='taskItem'] > .task-item__content,
+.notes-editor .task-item > .task-item__content {
+  flex: 1 1 0;
   min-width: 0;
+}
+
+/* Timestamp + delete stay on the right; delete is last (far from checkbox) */
+.notes-editor .task-item__end {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: center;
+  flex-shrink: 0;
+  gap: 0.2rem;
+  margin-left: auto;
 }
 
 .notes-editor .task-item__stamp {
   flex-shrink: 0;
-  align-self: center;
   font-size: 0.65rem;
   line-height: 1.25;
   opacity: 0.58;
   white-space: nowrap;
-  padding-left: 0.4rem;
   font-variant-numeric: tabular-nums;
   color: var(--dro-text);
   text-shadow: var(--dro-text-legibility);
@@ -175,7 +187,6 @@
 
 .notes-editor .task-item__delete {
   flex-shrink: 0;
-  margin-left: auto;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -189,7 +200,6 @@
   color: var(--dro-text);
   opacity: 0.38;
   cursor: pointer;
-  align-self: center;
   transition:
     opacity 0.15s ease,
     background 0.15s ease,
@@ -216,25 +226,29 @@
   opacity: 0.65;
 }
 
-/* Checked tasks stay in the list; strike through inline marks too (urgent, bold, color) */
-.notes-editor li[data-type='taskItem'][data-checked='true'] > div {
+/* Strikethrough only on the text column (not .task-item__end), including urgent + marks */
+.notes-editor li[data-type='taskItem'][data-checked='true'] > .task-item__content {
   opacity: 0.72;
 }
 
-.notes-editor li[data-type='taskItem'][data-checked='true'] > div,
-.notes-editor li[data-type='taskItem'][data-checked='true'] > div * {
-  text-decoration: line-through;
+.notes-editor li[data-type='taskItem'][data-checked='true'] > .task-item__content,
+.notes-editor li[data-type='taskItem'][data-checked='true'] > .task-item__content * {
+  text-decoration-line: line-through;
+  text-decoration-color: currentColor;
   text-decoration-thickness: max(1px, 0.07em);
+  text-decoration-skip-ink: none;
 }
 
-.notes-editor .task-item[data-checked='true'] > div {
+.notes-editor .task-item[data-checked='true'] > .task-item__content {
   opacity: 0.72;
 }
 
-.notes-editor .task-item[data-checked='true'] > div,
-.notes-editor .task-item[data-checked='true'] > div * {
-  text-decoration: line-through;
+.notes-editor .task-item[data-checked='true'] > .task-item__content,
+.notes-editor .task-item[data-checked='true'] > .task-item__content * {
+  text-decoration-line: line-through;
+  text-decoration-color: currentColor;
   text-decoration-thickness: max(1px, 0.07em);
+  text-decoration-skip-ink: none;
 }
 
 .notes-editor .task-item--urgent,
@@ -243,6 +257,14 @@
   border-left: 3px solid var(--dro-urgent);
   padding-left: var(--dro-density-urgent-pl, 0.45rem);
   background: color-mix(in srgb, var(--dro-urgent) 8%, transparent);
+}
+
+.notes-editor li[data-type='taskItem'].task-item--urgent[data-checked='true'] > .task-item__content,
+.notes-editor li[data-type='taskItem'].task-item--urgent[data-checked='true'] > .task-item__content * {
+  text-decoration-line: line-through;
+  text-decoration-color: currentColor;
+  text-decoration-thickness: max(1px, 0.07em);
+  text-decoration-skip-ink: none;
 }
 
 .notes-editor p {

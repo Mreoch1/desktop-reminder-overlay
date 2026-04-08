@@ -109,6 +109,18 @@ body {
   --dro-chrome-mult: 1;
 }
 
+/* In idle dim mode, hide all frame chrome and show only reminder content. */
+.app-shell--chrome-dim:not(:hover):not(:focus-within) {
+  --dro-chrome-mult: 0;
+}
+
+.app-shell--chrome-dim:not(:hover):not(:focus-within) .title-bar,
+.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-toolbar,
+.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor-footer {
+  opacity: 0;
+  pointer-events: none;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .app-shell {
     transition: none;

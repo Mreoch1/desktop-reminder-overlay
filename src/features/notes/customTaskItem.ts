@@ -47,6 +47,10 @@ export const CustomTaskItem = TaskItem.extend({
       const checkboxStyler = document.createElement('span')
       const checkbox = document.createElement('input')
       const content = document.createElement('div')
+      content.className = 'task-item__content'
+      const endRow = document.createElement('div')
+      endRow.className = 'task-item__end'
+      endRow.contentEditable = 'false'
       const deleteBtn = document.createElement('button')
       deleteBtn.type = 'button'
       deleteBtn.className = 'task-item__delete'
@@ -182,7 +186,8 @@ export const CustomTaskItem = TaskItem.extend({
       checkboxWrapper.append(checkbox, checkboxStyler)
       deleteBtn.hidden = !editor.isEditable
       deleteBtn.tabIndex = editor.isEditable ? 0 : -1
-      listItem.append(checkboxWrapper, content, deleteBtn, stamp)
+      endRow.append(stamp, deleteBtn)
+      listItem.append(checkboxWrapper, content, endRow)
       Object.entries(HTMLAttributes).forEach(([key, value]) => {
         listItem.setAttribute(key, value)
       })
