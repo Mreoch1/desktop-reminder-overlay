@@ -46,6 +46,7 @@ export default function App() {
   const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const chromeLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const pointerInsideShell = useRef(false)
   const shellRef = useRef<HTMLDivElement | null>(null)
 
   const showToast = useCallback(
@@ -266,6 +267,7 @@ export default function App() {
   const scheduleChromeDeactivate = useCallback(() => {
     if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
     chromeLeaveTimer.current = setTimeout(() => {
+      if (pointerInsideShell.current) return
       const stillFocused = shellRef.current?.matches(':focus-within') ?? false
       if (!stillFocused) {
         setChromeActive(false)
@@ -300,10 +302,23 @@ export default function App() {
       }${s.chromeDimUntilHover && chromeActive ? ' app-shell--chrome-active' : ''}${
         s.chromeDimUntilHover && !chromeActive ? ' app-shell--chrome-idle' : ''
       }`}
-      onMouseEnter={s.chromeDimUntilHover ? activateChrome : undefined}
-      onMouseLeave={s.chromeDimUntilHover ? scheduleChromeDeactivate : undefined}
+      onMouseEnter={
+        s.chromeDimUntilHover
+          ? () => {
+              pointerInsideShell.current = true
+              activateChrome()
+            }
+          : undefined
+      }
+      onMouseLeave={
+        s.chromeDimUntilHover
+          ? () => {
+              pointerInsideShell.current = false
+              scheduleChromeDeactivate()
+            }
+          : undefined
+      }
       onFocusCapture={s.chromeDimUntilHover ? activateChrome : undefined}
-      onBlurCapture={s.chromeDimUntilHover ? scheduleChromeDeactivate : undefined}
     >
       <Toast
         message={toast?.message ?? null}
