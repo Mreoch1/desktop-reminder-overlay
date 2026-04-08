@@ -14,7 +14,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 // Node ESM in packaged apps resolves `electron-log/main.js`, not `electron-log/main`
 import log from 'electron-log/main.js'
-import { autoUpdater } from 'electron-updater'
+import electronUpdaterPkg from 'electron-updater'
 import type { AppData } from '../src/shared/types'
 import { DATA_VERSION, defaultSettings } from '../src/shared/types'
 import { emptyDoc } from '../src/shared/defaultDoc'
@@ -38,6 +38,7 @@ log.transports.console.level = isDev ? 'debug' : 'warn'
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
 let updateCheckInFlight = false
+const { autoUpdater } = electronUpdaterPkg
 
 function dataFilePath(): string {
   return getDataFilePath(app.getPath('userData'))

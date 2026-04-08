@@ -59,6 +59,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 ## Releases (notable)
 
 - **v1.0.17** (tag pushed 2026-04-08): Windows Release workflow completed successfully. This build includes the main-process fix (external `electron-updater` in `vite.config.ts`). **Windows installers 1.0.15 and earlier can crash at startup** with `require('fs')` / Rolldown; testers should uninstall the old app and install **1.0.16 or newer** (prefer **1.0.17**).
+- **v1.0.18** (queued): fixes Windows startup crash in packaged app caused by ESM/CJS interop (`electron/main.ts` now imports `electron-updater` via default import and destructures `autoUpdater`).
 
 ## Open issues
 
