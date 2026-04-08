@@ -268,7 +268,6 @@ export default function App() {
     }
 
     const updateChromeState = (x?: number, y?: number): void => {
-      const hasWindowFocus = document.hasFocus()
       if (typeof x === 'number' && typeof y === 'number') {
         const rect = shellRef.current?.getBoundingClientRect()
         pointerInsideShell.current = Boolean(
@@ -280,7 +279,8 @@ export default function App() {
         )
       }
 
-      setChromeActive(hasWindowFocus || pointerInsideShell.current)
+      const hasAppFocus = shellRef.current?.matches(':focus-within') ?? false
+      setChromeActive(pointerInsideShell.current || hasAppFocus || settingsOpen)
     }
 
     let rafId = 0
@@ -293,19 +293,25 @@ export default function App() {
 
     const onWindowFocus = (): void => updateChromeState()
     const onWindowBlur = (): void => updateChromeState()
+    const onFocusIn = (): void => updateChromeState()
+    const onFocusOut = (): void => updateChromeState()
 
     updateChromeState()
     window.addEventListener('mousemove', onMouseMove, { passive: true })
     window.addEventListener('focus', onWindowFocus)
     window.addEventListener('blur', onWindowBlur)
+    window.addEventListener('focusin', onFocusIn)
+    window.addEventListener('focusout', onFocusOut)
 
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
       window.removeEventListener('mousemove', onMouseMove)
       window.removeEventListener('focus', onWindowFocus)
       window.removeEventListener('blur', onWindowBlur)
+      window.removeEventListener('focusin', onFocusIn)
+      window.removeEventListener('focusout', onFocusOut)
     }
-  }, [ready, data.settings.chromeDimUntilHover])
+  }, [ready, data.settings.chromeDimUntilHover, settingsOpen])
 
   useEffect(() => {
     const off = window.deskOverlay.onShortcut(() => {
