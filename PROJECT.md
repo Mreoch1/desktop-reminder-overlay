@@ -46,6 +46,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 ## Production hardening (recent)
 
 - Main process bundle: **`electron-log` must stay external** in `vite.config.ts`. Bundling it breaks packaged apps (Rolldown ESM + `require('electron')` inside electron-log). Import **`electron-log/main.js`** (with extension) so Node ESM finds the file inside `app.asar`.
+- Main process bundle: **`electron-updater` must stay external** in `vite.config.ts` (same reason, CommonJS internals that call `require('fs')`). Do not bundle it into ESM output.
 - Single instance: second launch focuses the existing window.
 - Atomic save to `reminders-data.json` with `.bak` rotation; load falls back to `.bak` if the primary file is invalid JSON.
 - Main-process logging via `electron-log`.

@@ -24,8 +24,13 @@ export default defineConfig({
           build: {
             rollupOptions: {
               // electron-log uses require('electron'); bundling it breaks ESM main output (Rolldown/Vite 8).
+              // electron-updater also depends on CommonJS internals; keep both external.
               // Use `main.js` so runtime resolution matches inside app.asar (Node ESM).
-              external: ['electron-log/main.js', 'electron-log'],
+              external: [
+                'electron-log/main.js',
+                'electron-log',
+                'electron-updater',
+              ],
             },
           },
         },
