@@ -262,10 +262,7 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (!ready || !data.settings.chromeDimUntilHover) {
-      setChromeActive(false)
-      return
-    }
+    if (!ready || !data.settings.chromeDimUntilHover) return
 
     const updateChromeState = (x?: number, y?: number): void => {
       if (typeof x === 'number' && typeof y === 'number') {

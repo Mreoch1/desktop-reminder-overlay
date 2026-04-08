@@ -51,7 +51,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 
 ## Open issues
 
-- None tracked; use this file when scope changes.
+- CI lint guard: avoid direct `setState` calls in effect bodies under `react-hooks/set-state-in-effect`; state updates must come from subscribed callbacks/events.
 
 ## Paths
 
