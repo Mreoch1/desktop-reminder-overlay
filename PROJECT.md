@@ -18,6 +18,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 ## Decisions
 
 - Frameless window with custom title bar; `-webkit-app-region` drag on the title area.
+- Auto-updates: main process uses `electron-updater` with GitHub Releases publish provider. On startup (production only), app checks for updates, prompts user to download if available, and prompts restart after download (`quitAndInstall`).
 - macOS: `setVisibleOnAllWorkspaces` uses `skipTransformProcessType: true` so Electron does not flip the app into `UIElement` process mode (which omits the app from the standard Force Quit dialog). `app.setActivationPolicy('regular')` on startup reinforces a normal foreground app.
 - No click-through: the window always receives mouse events (removed for usability). Main calls `setIgnoreMouseEvents(false)` on create and ready-to-show so a stale `dist-electron` build that still honored old `clickThrough` in JSON cannot leave the window non-interactive after `npm run build`.
 - Task list rows use CSS on `li[data-type="taskItem"]` so the checkbox stays beside the text (TipTap does not always add `.task-item` alone). Row DOM: checkbox `label`, **`.task-item__content`** (TipTap `contentDOM`), **`.task-item__end`** (timestamp + delete). Delete is last so it sits away from the checkbox. Strikethrough targets **`.task-item__content`** only (not the end cluster), including urgent rows and inline marks. Deleting the **last** row clears it to an empty task line so `taskList` always has at least one `taskItem`.
@@ -35,6 +36,8 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 ## Build
 
 - CSS: `backdrop-filter` is paired with `-webkit-backdrop-filter` for WebKit. `color-mix` usage lives in `@supports` blocks so compat tooling treats it as guarded; fallbacks use solid `var()` colors. `.hintrc` ignores `-webkit-app-region` (Electron frameless drag only; not a general web property).
+- Auto-update releases: publish non-draft GitHub Releases that include generated updater artifacts (`latest*.yml` and platform files). `build.publish` points to this repo.
+- Local builds use `npm run build` (`electron-builder --publish never`) so packaging works without `GH_TOKEN`. Release upload uses `npm run build:publish` with `GH_TOKEN` set.
 - `npm run dev` starts Vite and Electron (vite-plugin-electron).
 - `npm run build` runs `tsc`, Vite (renderer + main + preload), and electron-builder. Artifacts under `release/`.
 - `npm run build:renderer` runs `tsc` and Vite only (CI, fast check).

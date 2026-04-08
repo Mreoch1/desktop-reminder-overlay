@@ -14,6 +14,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
 // Node ESM in packaged apps resolves `electron-log/main.js`, not `electron-log/main`
 import log from 'electron-log/main.js'
+import { autoUpdater } from 'electron-updater'
 import type { AppData } from '../src/shared/types'
 import { DATA_VERSION, defaultSettings } from '../src/shared/types'
 import { emptyDoc } from '../src/shared/defaultDoc'
@@ -36,6 +37,7 @@ log.transports.console.level = isDev ? 'debug' : 'warn'
 
 let mainWindow: BrowserWindow | null = null
 let tray: Tray | null = null
+let updateCheckInFlight = false
 
 function dataFilePath(): string {
   return getDataFilePath(app.getPath('userData'))
@@ -296,6 +298,76 @@ function registerShortcutFromSettings(): void {
   }
 }
 
+function setupAutoUpdates(): void {
+  if (isDev) return
+
+  autoUpdater.autoDownload = false
+  autoUpdater.autoInstallOnAppQuit = true
+  autoUpdater.logger = log
+
+  autoUpdater.on('error', (error) => {
+    log.error('autoUpdater error', error)
+  })
+
+  autoUpdater.on('update-available', (info) => {
+    void dialog
+      .showMessageBox(mainWindow ?? undefined, {
+        type: 'info',
+        title: 'Update available',
+        message: `Version ${info.version} is available.`,
+        detail: 'Download and install this update now?',
+        buttons: ['Download update', 'Later'],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      .then((res) => {
+        if (res.response === 0) {
+          void autoUpdater.downloadUpdate()
+        }
+      })
+      .catch((e) => {
+        log.error('update available prompt failed', e)
+      })
+  })
+
+  autoUpdater.on('update-downloaded', (info) => {
+    void dialog
+      .showMessageBox(mainWindow ?? undefined, {
+        type: 'info',
+        title: 'Update ready',
+        message: `Version ${info.version} has been downloaded.`,
+        detail: 'Restart now to apply the update?',
+        buttons: ['Restart and install', 'Later'],
+        defaultId: 0,
+        cancelId: 1,
+      })
+      .then((res) => {
+        if (res.response === 0) {
+          setImmediate(() => autoUpdater.quitAndInstall())
+        }
+      })
+      .catch((e) => {
+        log.error('update downloaded prompt failed', e)
+      })
+  })
+
+  const checkForUpdates = (): void => {
+    if (updateCheckInFlight) return
+    updateCheckInFlight = true
+    void autoUpdater
+      .checkForUpdates()
+      .catch((e) => {
+        log.error('checkForUpdates failed', e)
+      })
+      .finally(() => {
+        updateCheckInFlight = false
+      })
+  }
+
+  // Startup check after app window is shown and stable.
+  setTimeout(checkForUpdates, 3500)
+}
+
 function wireIpc(): void {
   ipcMain.handle('window:minimize', () => {
     mainWindow?.minimize()
@@ -473,6 +545,7 @@ function startApp(): void {
   createTray()
   createWindow()
   registerShortcutFromSettings()
+  setupAutoUpdates()
   log.info('Desktop Reminder started', { version: app.getVersion() })
 
   app.on('activate', () => {
