@@ -34,6 +34,7 @@ export default function App() {
   } = useAppStore()
 
   const [settingsOpen, setSettingsOpen] = useState(false)
+  const [chromeActive, setChromeActive] = useState(false)
   const [shortcutHint, setShortcutHint] = useState<string | null>(null)
   const [toast, setToast] = useState<{
     message: string
@@ -44,6 +45,8 @@ export default function App() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const chromeLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
+  const shellRef = useRef<HTMLDivElement | null>(null)
 
   const showToast = useCallback(
     (message: string, variant: 'error' | 'info' = 'info') => {
@@ -251,7 +254,23 @@ export default function App() {
       if (saveTimer.current) clearTimeout(saveTimer.current)
       if (shortcutTimer.current) clearTimeout(shortcutTimer.current)
       if (toastTimer.current) clearTimeout(toastTimer.current)
+      if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
     }
+  }, [])
+
+  const activateChrome = useCallback(() => {
+    if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
+    setChromeActive(true)
+  }, [])
+
+  const scheduleChromeDeactivate = useCallback(() => {
+    if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
+    chromeLeaveTimer.current = setTimeout(() => {
+      const stillFocused = shellRef.current?.matches(':focus-within') ?? false
+      if (!stillFocused) {
+        setChromeActive(false)
+      }
+    }, 120)
   }, [])
 
   useEffect(() => {
@@ -275,9 +294,16 @@ export default function App() {
 
   return (
     <div
+      ref={shellRef}
       className={`app-shell ${densityClass}${
         s.chromeDimUntilHover ? ' app-shell--chrome-dim' : ''
+      }${s.chromeDimUntilHover && chromeActive ? ' app-shell--chrome-active' : ''}${
+        s.chromeDimUntilHover && !chromeActive ? ' app-shell--chrome-idle' : ''
       }`}
+      onMouseEnter={s.chromeDimUntilHover ? activateChrome : undefined}
+      onMouseLeave={s.chromeDimUntilHover ? scheduleChromeDeactivate : undefined}
+      onFocusCapture={s.chromeDimUntilHover ? activateChrome : undefined}
+      onBlurCapture={s.chromeDimUntilHover ? scheduleChromeDeactivate : undefined}
     >
       <Toast
         message={toast?.message ?? null}

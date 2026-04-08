@@ -104,13 +104,13 @@ body {
   --dro-chrome-mult: var(--dro-chrome-dim-strength, 0.38);
 }
 
-.app-shell--chrome-dim:hover,
+.app-shell--chrome-dim.app-shell--chrome-active,
 .app-shell--chrome-dim:focus-within {
   --dro-chrome-mult: 1;
 }
 
 /* In idle dim mode, hide all frame chrome and show only reminder content. */
-.app-shell--chrome-dim:not(:hover):not(:focus-within) {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) {
   --dro-chrome-mult: 0;
   background: transparent;
   border-color: transparent;
@@ -119,28 +119,28 @@ body {
   backdrop-filter: none;
 }
 
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .title-bar,
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-toolbar,
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor-footer {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .title-bar,
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-toolbar,
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor-footer {
   display: none;
 }
 
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .app-shell__main {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .app-shell__main {
   padding: 0;
 }
 
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor-wrap {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor-wrap {
   gap: 0;
 }
 
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor li[data-type='taskItem'],
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor .task-item {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor li[data-type='taskItem'],
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor .task-item {
   background: transparent;
   border-left-color: transparent;
 }
 
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor .task-item__stamp,
-.app-shell--chrome-dim:not(:hover):not(:focus-within) .notes-editor .task-item__delete {
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor .task-item__stamp,
+.app-shell--chrome-dim.app-shell--chrome-idle:not(:focus-within) .notes-editor .task-item__delete {
   opacity: 0;
   pointer-events: none;
 }
