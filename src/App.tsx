@@ -46,6 +46,7 @@ export default function App() {
   const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pointerInsideShell = useRef(false)
+  const lastPointerInsideAt = useRef(0)
   const shellRef = useRef<HTMLDivElement | null>(null)
 
   const showToast = useCallback(
@@ -265,18 +266,25 @@ export default function App() {
     if (!ready || !data.settings.chromeDimUntilHover) return
 
     const updateChromeState = (x?: number, y?: number): void => {
+      const now = Date.now()
       if (typeof x === 'number' && typeof y === 'number') {
         const rect = shellRef.current?.getBoundingClientRect()
+        const hoverSlopPx = 8
         pointerInsideShell.current = Boolean(
           rect &&
-            x >= rect.left &&
-            x <= rect.right &&
-            y >= rect.top &&
-            y <= rect.bottom,
+            x >= rect.left - hoverSlopPx &&
+            x <= rect.right + hoverSlopPx &&
+            y >= rect.top - hoverSlopPx &&
+            y <= rect.bottom + hoverSlopPx,
         )
+        if (pointerInsideShell.current) {
+          lastPointerInsideAt.current = now
+        }
       }
 
-      setChromeActive(pointerInsideShell.current || settingsOpen)
+      const holdAfterLeaveMs = 180
+      const withinLeaveGrace = now - lastPointerInsideAt.current <= holdAfterLeaveMs
+      setChromeActive(pointerInsideShell.current || withinLeaveGrace || settingsOpen)
     }
 
     let rafId = 0
