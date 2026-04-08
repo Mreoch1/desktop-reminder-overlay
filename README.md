@@ -86,7 +86,8 @@ Logs from the main process are written by [electron-log](https://github.com/mega
 | Script              | Description                                      |
 | ------------------- | ------------------------------------------------ |
 | `npm run dev`       | Development with Electron                        |
-| `npm run build`     | Typecheck, Vite build, electron-builder pack     |
+| `npm run build`     | Typecheck, Vite build, electron-builder pack (no publish) |
+| `npm run build:publish` | Typecheck, Vite build, electron-builder publish |
 | `npm run build:renderer` | Typecheck + Vite only (no installer)        |
 | `npm run lint`      | ESLint                                           |
 | `npm run typecheck` | `tsc -b`                                         |
@@ -94,6 +95,15 @@ Logs from the main process are written by [electron-log](https://github.com/mega
 ## Distribution
 
 See [docs/RELEASE.md](docs/RELEASE.md) for code signing, notarization (macOS), and CI notes.
+
+### Windows signing (SmartScreen)
+
+To reduce Windows SmartScreen warnings, configure these GitHub repository secrets for the release workflow:
+
+- `WIN_CSC_LINK` - Base64 `.pfx` certificate or secure URL to the cert file
+- `WIN_CSC_KEY_PASSWORD` - Certificate password
+
+If secrets are not set, builds still publish but remain unsigned.
 
 ## License
 

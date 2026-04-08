@@ -31,4 +31,7 @@ jobs:
       - name: Build and publish Windows artifacts
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # Optional signing secrets: when provided, electron-builder signs Windows installers.
+          CSC_LINK: ${{ secrets.WIN_CSC_LINK }}
+          CSC_KEY_PASSWORD: ${{ secrets.WIN_CSC_KEY_PASSWORD }}
         run: npm run build:publish -- --win
