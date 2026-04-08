@@ -38,6 +38,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 - CSS: `backdrop-filter` is paired with `-webkit-backdrop-filter` for WebKit. `color-mix` usage lives in `@supports` blocks so compat tooling treats it as guarded; fallbacks use solid `var()` colors. `.hintrc` ignores `-webkit-app-region` (Electron frameless drag only; not a general web property).
 - Auto-update releases: publish non-draft GitHub Releases that include generated updater artifacts (`latest*.yml` and platform files). `build.publish` points to this repo.
 - Local builds use `npm run build` (`electron-builder --publish never`) so packaging works without `GH_TOKEN`. Release upload uses `npm run build:publish` with `GH_TOKEN` set.
+- Windows distribution: `.github/workflows/windows-release.yml` builds on `windows-latest` and publishes Windows assets to GitHub Releases on `v*` tags (or manual dispatch).
 - `npm run dev` starts Vite and Electron (vite-plugin-electron).
 - `npm run build` runs `tsc`, Vite (renderer + main + preload), and electron-builder. Artifacts under `release/`.
 - `npm run build:renderer` runs `tsc` and Vite only (CI, fast check).
