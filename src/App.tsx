@@ -45,7 +45,6 @@ export default function App() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const chromeLeaveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const pointerInsideShell = useRef(false)
   const shellRef = useRef<HTMLDivElement | null>(null)
 
@@ -255,25 +254,58 @@ export default function App() {
       if (saveTimer.current) clearTimeout(saveTimer.current)
       if (shortcutTimer.current) clearTimeout(shortcutTimer.current)
       if (toastTimer.current) clearTimeout(toastTimer.current)
-      if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
     }
   }, [])
 
   const activateChrome = useCallback(() => {
-    if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
     setChromeActive(true)
   }, [])
 
-  const scheduleChromeDeactivate = useCallback(() => {
-    if (chromeLeaveTimer.current) clearTimeout(chromeLeaveTimer.current)
-    chromeLeaveTimer.current = setTimeout(() => {
-      if (pointerInsideShell.current) return
-      const stillFocused = shellRef.current?.matches(':focus-within') ?? false
-      if (!stillFocused) {
-        setChromeActive(false)
+  useEffect(() => {
+    if (!ready || !data.settings.chromeDimUntilHover) {
+      setChromeActive(false)
+      return
+    }
+
+    const updateChromeState = (x?: number, y?: number): void => {
+      const hasWindowFocus = document.hasFocus()
+      if (typeof x === 'number' && typeof y === 'number') {
+        const rect = shellRef.current?.getBoundingClientRect()
+        pointerInsideShell.current = Boolean(
+          rect &&
+            x >= rect.left &&
+            x <= rect.right &&
+            y >= rect.top &&
+            y <= rect.bottom,
+        )
       }
-    }, 120)
-  }, [])
+
+      setChromeActive(hasWindowFocus || pointerInsideShell.current)
+    }
+
+    let rafId = 0
+    const onMouseMove = (e: MouseEvent): void => {
+      if (rafId) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(() => {
+        updateChromeState(e.clientX, e.clientY)
+      })
+    }
+
+    const onWindowFocus = (): void => updateChromeState()
+    const onWindowBlur = (): void => updateChromeState()
+
+    updateChromeState()
+    window.addEventListener('mousemove', onMouseMove, { passive: true })
+    window.addEventListener('focus', onWindowFocus)
+    window.addEventListener('blur', onWindowBlur)
+
+    return () => {
+      if (rafId) cancelAnimationFrame(rafId)
+      window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('focus', onWindowFocus)
+      window.removeEventListener('blur', onWindowBlur)
+    }
+  }, [ready, data.settings.chromeDimUntilHover])
 
   useEffect(() => {
     const off = window.deskOverlay.onShortcut(() => {
@@ -302,22 +334,6 @@ export default function App() {
       }${s.chromeDimUntilHover && chromeActive ? ' app-shell--chrome-active' : ''}${
         s.chromeDimUntilHover && !chromeActive ? ' app-shell--chrome-idle' : ''
       }`}
-      onMouseEnter={
-        s.chromeDimUntilHover
-          ? () => {
-              pointerInsideShell.current = true
-              activateChrome()
-            }
-          : undefined
-      }
-      onMouseLeave={
-        s.chromeDimUntilHover
-          ? () => {
-              pointerInsideShell.current = false
-              scheduleChromeDeactivate()
-            }
-          : undefined
-      }
       onFocusCapture={s.chromeDimUntilHover ? activateChrome : undefined}
     >
       <Toast
