@@ -276,8 +276,7 @@ export default function App() {
         )
       }
 
-      const hasAppFocus = shellRef.current?.matches(':focus-within') ?? false
-      setChromeActive(pointerInsideShell.current || hasAppFocus || settingsOpen)
+      setChromeActive(pointerInsideShell.current || settingsOpen)
     }
 
     let rafId = 0
@@ -289,12 +288,22 @@ export default function App() {
     }
 
     const onWindowFocus = (): void => updateChromeState()
-    const onWindowBlur = (): void => updateChromeState()
+    const onWindowBlur = (): void => {
+      pointerInsideShell.current = false
+      updateChromeState()
+    }
     const onFocusIn = (): void => updateChromeState()
     const onFocusOut = (): void => updateChromeState()
+    const onWindowMouseOut = (e: MouseEvent): void => {
+      if (e.relatedTarget === null) {
+        pointerInsideShell.current = false
+        updateChromeState()
+      }
+    }
 
     updateChromeState()
     window.addEventListener('mousemove', onMouseMove, { passive: true })
+    window.addEventListener('mouseout', onWindowMouseOut)
     window.addEventListener('focus', onWindowFocus)
     window.addEventListener('blur', onWindowBlur)
     window.addEventListener('focusin', onFocusIn)
@@ -303,6 +312,7 @@ export default function App() {
     return () => {
       if (rafId) cancelAnimationFrame(rafId)
       window.removeEventListener('mousemove', onMouseMove)
+      window.removeEventListener('mouseout', onWindowMouseOut)
       window.removeEventListener('focus', onWindowFocus)
       window.removeEventListener('blur', onWindowBlur)
       window.removeEventListener('focusin', onFocusIn)
