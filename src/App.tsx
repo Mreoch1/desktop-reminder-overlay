@@ -262,6 +262,18 @@ export default function App() {
     setChromeActive(true)
   }, [])
 
+  const handleShellPointerEnter = useCallback(() => {
+    pointerInsideShell.current = true
+    lastPointerInsideAt.current = Date.now()
+    setChromeActive(true)
+  }, [])
+
+  const handleShellPointerLeave = useCallback(() => {
+    pointerInsideShell.current = false
+    lastPointerInsideAt.current = 0
+    setChromeActive(settingsOpen)
+  }, [settingsOpen])
+
   useEffect(() => {
     if (!ready || !data.settings.chromeDimUntilHover) return
 
@@ -356,6 +368,8 @@ export default function App() {
         s.chromeDimUntilHover && !chromeActive ? ' app-shell--chrome-idle' : ''
       }`}
       onFocusCapture={s.chromeDimUntilHover ? activateChrome : undefined}
+      onPointerEnter={s.chromeDimUntilHover ? handleShellPointerEnter : undefined}
+      onPointerLeave={s.chromeDimUntilHover ? handleShellPointerLeave : undefined}
     >
       <Toast
         message={toast?.message ?? null}

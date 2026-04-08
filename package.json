@@ -1,7 +1,7 @@
 {
   "name": "desktop-reminder-overlay",
   "private": true,
-  "version": "1.0.10",
+  "version": "1.0.11",
   "description": "Floating desktop checklist and notes overlay for macOS and Windows",
   "author": "",
   "license": "MIT",
