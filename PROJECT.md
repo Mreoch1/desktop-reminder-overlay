@@ -56,6 +56,10 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 - Windows: `app.setAppUserModelId` for taskbar grouping.
 - React **ErrorBoundary** around the tree.
 
+## Releases (notable)
+
+- **v1.0.17** (tag pushed 2026-04-08): Windows Release workflow completed successfully. This build includes the main-process fix (external `electron-updater` in `vite.config.ts`). **Windows installers 1.0.15 and earlier can crash at startup** with `require('fs')` / Rolldown; testers should uninstall the old app and install **1.0.16 or newer** (prefer **1.0.17**).
+
 ## Open issues
 
 - CI lint guard: avoid direct `setState` calls in effect bodies under `react-hooks/set-state-in-effect`; state updates must come from subscribed callbacks/events.
