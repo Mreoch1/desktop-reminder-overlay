@@ -201,6 +201,12 @@ function createWindow(): void {
   mainWindow.on('close', commitBounds)
   mainWindow.on('moved', commitBounds)
   mainWindow.on('resized', commitBounds)
+  mainWindow.on('mouseenter', () => {
+    mainWindow?.webContents.send('window:hover-changed', true)
+  })
+  mainWindow.on('mouseleave', () => {
+    mainWindow?.webContents.send('window:hover-changed', false)
+  })
 
   mainWindow.on('closed', () => {
     mainWindow = null

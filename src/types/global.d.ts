@@ -45,6 +45,7 @@ declare global {
       ) => Promise<{ ok: boolean; reason?: string }>
       onShortcut: (callback: () => void) => () => void
       onBoundsCommit: (callback: () => void) => () => void
+      onWindowHoverChanged: (callback: (hovered: boolean) => void) => () => void
     }
   }
 }

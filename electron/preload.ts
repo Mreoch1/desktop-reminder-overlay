@@ -75,6 +75,16 @@ const api = {
       ipcRenderer.removeListener('window:bounds-changed', handler)
     }
   },
+
+  onWindowHoverChanged: (callback: (hovered: boolean) => void): (() => void) => {
+    const handler = (_event: Electron.IpcRendererEvent, hovered: boolean): void => {
+      callback(hovered)
+    }
+    ipcRenderer.on('window:hover-changed', handler)
+    return () => {
+      ipcRenderer.removeListener('window:hover-changed', handler)
+    }
+  },
 }
 
 contextBridge.exposeInMainWorld('deskOverlay', api)

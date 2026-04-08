@@ -34,7 +34,7 @@ export default function App() {
   } = useAppStore()
 
   const [settingsOpen, setSettingsOpen] = useState(false)
-  const [chromeActive, setChromeActive] = useState(false)
+  const [windowHovered, setWindowHovered] = useState(false)
   const [shortcutHint, setShortcutHint] = useState<string | null>(null)
   const [toast, setToast] = useState<{
     message: string
@@ -45,9 +45,6 @@ export default function App() {
   const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const shortcutTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
-  const pointerInsideShell = useRef(false)
-  const lastPointerInsideAt = useRef(0)
-  const shellRef = useRef<HTMLDivElement | null>(null)
 
   const showToast = useCallback(
     (message: string, variant: 'error' | 'info' = 'info') => {
@@ -258,87 +255,13 @@ export default function App() {
     }
   }, [])
 
-  const activateChrome = useCallback(() => {
-    setChromeActive(true)
-  }, [])
-
-  const handleShellPointerEnter = useCallback(() => {
-    pointerInsideShell.current = true
-    lastPointerInsideAt.current = Date.now()
-    setChromeActive(true)
-  }, [])
-
-  const handleShellPointerLeave = useCallback(() => {
-    pointerInsideShell.current = false
-    lastPointerInsideAt.current = 0
-    setChromeActive(settingsOpen)
-  }, [settingsOpen])
-
   useEffect(() => {
-    if (!ready || !data.settings.chromeDimUntilHover) return
-
-    const updateChromeState = (x?: number, y?: number): void => {
-      const now = Date.now()
-      if (typeof x === 'number' && typeof y === 'number') {
-        const rect = shellRef.current?.getBoundingClientRect()
-        const hoverSlopPx = 8
-        pointerInsideShell.current = Boolean(
-          rect &&
-            x >= rect.left - hoverSlopPx &&
-            x <= rect.right + hoverSlopPx &&
-            y >= rect.top - hoverSlopPx &&
-            y <= rect.bottom + hoverSlopPx,
-        )
-        if (pointerInsideShell.current) {
-          lastPointerInsideAt.current = now
-        }
-      }
-
-      const holdAfterLeaveMs = 180
-      const withinLeaveGrace = now - lastPointerInsideAt.current <= holdAfterLeaveMs
-      setChromeActive(pointerInsideShell.current || withinLeaveGrace || settingsOpen)
-    }
-
-    let rafId = 0
-    const onMouseMove = (e: MouseEvent): void => {
-      if (rafId) cancelAnimationFrame(rafId)
-      rafId = requestAnimationFrame(() => {
-        updateChromeState(e.clientX, e.clientY)
-      })
-    }
-
-    const onWindowFocus = (): void => updateChromeState()
-    const onWindowBlur = (): void => {
-      pointerInsideShell.current = false
-      updateChromeState()
-    }
-    const onFocusIn = (): void => updateChromeState()
-    const onFocusOut = (): void => updateChromeState()
-    const onWindowMouseOut = (e: MouseEvent): void => {
-      if (e.relatedTarget === null) {
-        pointerInsideShell.current = false
-        updateChromeState()
-      }
-    }
-
-    updateChromeState()
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-    window.addEventListener('mouseout', onWindowMouseOut)
-    window.addEventListener('focus', onWindowFocus)
-    window.addEventListener('blur', onWindowBlur)
-    window.addEventListener('focusin', onFocusIn)
-    window.addEventListener('focusout', onFocusOut)
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseout', onWindowMouseOut)
-      window.removeEventListener('focus', onWindowFocus)
-      window.removeEventListener('blur', onWindowBlur)
-      window.removeEventListener('focusin', onFocusIn)
-      window.removeEventListener('focusout', onFocusOut)
-    }
-  }, [ready, data.settings.chromeDimUntilHover, settingsOpen])
+    if (!ready) return
+    const offHover = window.deskOverlay.onWindowHoverChanged((hovered) => {
+      setWindowHovered(hovered)
+    })
+    return offHover
+  }, [ready])
 
   useEffect(() => {
     const off = window.deskOverlay.onShortcut(() => {
@@ -358,18 +281,15 @@ export default function App() {
   const s = data.settings
   const densityClass =
     s.density === 'compact' ? 'app-shell--compact' : 'app-shell--comfortable'
+  const chromeActive = windowHovered || settingsOpen
 
   return (
     <div
-      ref={shellRef}
       className={`app-shell ${densityClass}${
         s.chromeDimUntilHover ? ' app-shell--chrome-dim' : ''
       }${s.chromeDimUntilHover && chromeActive ? ' app-shell--chrome-active' : ''}${
         s.chromeDimUntilHover && !chromeActive ? ' app-shell--chrome-idle' : ''
       }`}
-      onFocusCapture={s.chromeDimUntilHover ? activateChrome : undefined}
-      onPointerEnter={s.chromeDimUntilHover ? handleShellPointerEnter : undefined}
-      onPointerLeave={s.chromeDimUntilHover ? handleShellPointerLeave : undefined}
     >
       <Toast
         message={toast?.message ?? null}
