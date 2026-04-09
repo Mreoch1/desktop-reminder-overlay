@@ -39,6 +39,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 - Auto-update releases: publish non-draft GitHub Releases that include generated updater artifacts (`latest*.yml` and platform files). `build.publish` points to this repo.
 - Local builds use `npm run build` (`electron-builder --publish never`) so packaging works without `GH_TOKEN`. Release upload uses `npm run build:publish` with `GH_TOKEN` set.
 - Windows distribution: `.github/workflows/windows-release.yml` builds on `windows-latest` and publishes Windows assets to GitHub Releases on `v*` tags (or manual dispatch).
+- macOS distribution: `.github/workflows/macos-release.yml` builds on `macos-latest` and publishes macOS assets to GitHub Releases on `v*` tags (or manual dispatch).
 - Windows signing readiness: workflow accepts optional secrets `WIN_CSC_LINK` and `WIN_CSC_KEY_PASSWORD` and maps them to `CSC_LINK` / `CSC_KEY_PASSWORD` for `electron-builder` signing.
 - `npm run dev` starts Vite and Electron (vite-plugin-electron).
 - `npm run build` runs `tsc`, Vite (renderer + main + preload), and electron-builder. Artifacts under `release/`.
@@ -60,6 +61,7 @@ Local-first Electron app: floating, always-on-top checklist and rich-text notes.
 
 - **v1.0.17** (tag pushed 2026-04-08): Windows Release workflow completed successfully. This build includes the main-process fix (external `electron-updater` in `vite.config.ts`). **Windows installers 1.0.15 and earlier can crash at startup** with `require('fs')` / Rolldown; testers should uninstall the old app and install **1.0.16 or newer** (prefer **1.0.17**).
 - **v1.0.18** (queued): fixes Windows startup crash in packaged app caused by ESM/CJS interop (`electron/main.ts` now imports `electron-updater` via default import and destructures `autoUpdater`).
+- Release automation updated: tags now trigger both Windows and macOS publish workflows so each version ships installers for both platforms.
 
 ## Open issues
 
